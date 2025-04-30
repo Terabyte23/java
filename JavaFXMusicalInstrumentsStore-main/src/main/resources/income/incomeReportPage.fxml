@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.MusicalInstrumentStoreFX.controller.IncomeReportController" spacing="20" alignment="CENTER">
+    <MenuBar>
+        <Menu text="Выбрать период">
+            <MenuItem text="Неделя" onAction="#selectWeek"/>
+            <MenuItem text="Месяц" onAction="#selectMonth"/>
+            <MenuItem text="Год" onAction="#selectYear"/>
+        </Menu>
+    </MenuBar>
+    <Label fx:id="lblIncome" text="Доход: " style="-fx-font-size: 16px;"/>
+    <Label fx:id="lblAmount" text="0" style="-fx-font-size: 16px;"/>
+    <Button text="Назад" onAction="#goBackToMainMenu" style="-fx-font-size: 14px; -fx-padding: 10px 20px;"/>
+</VBox>

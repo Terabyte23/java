@@ -1,0 +1,55 @@
+package com.example.MusicalInstrumentStoreFX.controller;
+
+import com.example.MusicalInstrumentStoreFX.model.entity.AppUser;
+import com.example.MusicalInstrumentStoreFX.service.AppUserService;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class WalletDialogController {
+
+    @FXML
+    private Label lblBuyerName;
+    @FXML
+    private TextField tfAmount;
+    @FXML
+    private Label lblCurrentBalance;
+
+    private AppUser appUser;
+
+    @Autowired
+    private AppUserService appUserService;
+
+    public void setAppUser(AppUser appUser) {
+        this.appUser = appUser;
+        lblBuyerName.setText("Покупатель: " + appUser.getFirstname() + " " + appUser.getLastname());
+        lblCurrentBalance.setText("Баланс: " + appUser.getBalance());
+    }
+
+    @FXML
+    private void onTopUp() {
+        try {
+            double amount = Double.parseDouble(tfAmount.getText());
+            if (amount > 0) {
+                Double currentBalance = appUser.getBalance();
+                appUser.setBalance(currentBalance + amount);
+                appUserService.update(appUser);
+                lblCurrentBalance.setText("Баланс: " + appUser.getBalance());
+            } else {
+                tfAmount.setStyle("-fx-border-color: red;");
+            }
+        } catch (NumberFormatException e) {
+            tfAmount.setStyle("-fx-border-color: red;");
+        }
+        closeWindow();
+    }
+
+    private void closeWindow() {
+        Stage stage = (Stage) tfAmount.getScene().getWindow();
+        stage.close();
+    }
+}

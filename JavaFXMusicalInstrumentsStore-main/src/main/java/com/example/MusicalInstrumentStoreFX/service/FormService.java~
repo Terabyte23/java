@@ -1,0 +1,63 @@
+package com.example.MusicalInstrumentStoreFX.service;
+
+import com.example.MusicalInstrumentStoreFX.MusicalInstrumentStoreFxApplication;
+import com.example.MusicalInstrumentStoreFX.controller.EditBuyerFormController;
+import com.example.MusicalInstrumentStoreFX.controller.EditInstrumentsFormController;
+import com.example.MusicalInstrumentStoreFX.controller.SelectedInstrumentFormController;
+import com.example.MusicalInstrumentStoreFX.model.entity.AppUser;
+import com.example.MusicalInstrumentStoreFX.model.entity.Instruments;
+import com.example.MusicalInstrumentStoreFX.model.repository.InstrumentRepository;
+import com.example.MusicalInstrumentStoreFX.tools.SpringFXMLLoader;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+@Service
+public class FormService {
+    private final InstrumentRepository instrumentRepository;
+    private SpringFXMLLoader springFXMLLoader;
+
+    public FormService(SpringFXMLLoader springFXMLLoader, InstrumentRepository instrumentRepository) {
+        this.springFXMLLoader = springFXMLLoader;
+        this.instrumentRepository = instrumentRepository;
+    }
+
+    private Stage getPrimaryStage(){
+        return MusicalInstrumentStoreFxApplication.primaryStage;
+    }
+
+
+    public void goBackToMenu(Stage stage) {
+        FXMLLoader fxmlLoader = springFXMLLoader.load("/main/mainForm.fxml");
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Scene scene = new Scene(root);
+        getPrimaryStage().setScene(scene);
+        getPrimaryStage().setTitle("Nptv23JavaFX Магазин");
+        getPrimaryStage().centerOnScreen();
+        getPrimaryStage().show();
+    }
+
+    public void takeOnInstrument(Instruments instrument) {
+        if (instrument.getCount() > 0) {
+            instrument.setCount(instrument.getCount() - 1);  // Уменьшаем количество на 1
+            instrumentRepository.save(instrument);  // Сохраняем изменения в базе данных
+        }
+    }
+
+    // Если хотите вернуть инструмент (увеличить его количество)
+    public void returnInstrument(Instruments instrument) {
+        instrument.setCount(instrument.getCount() + 1);  // Увеличиваем количество на 1
+        instrumentRepository.save(instrument);  // Сохраняем изменения в базе данных
+    }
+
+}
