@@ -14,4 +14,12 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     @Query("SELECT s FROM Sale s WHERE s.date BETWEEN :startDate AND :endDate")
     List<Sale> findSalesBetweenDates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT s.instrument.title, COUNT(s) FROM Sale s WHERE s.date BETWEEN :startDate AND :endDate GROUP BY s.instrument.title ORDER BY COUNT(s) DESC")
+    List<Object[]> getSalesRanking(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT s.instrument.title, COUNT(s) FROM Sale s GROUP BY s.instrument.title ORDER BY COUNT(s) DESC")
+    List<Object[]> getAllTimeSalesRanking();
+
+    List<Sale> findSalesByDateBetween(LocalDate startDate, LocalDate endDate);
 }

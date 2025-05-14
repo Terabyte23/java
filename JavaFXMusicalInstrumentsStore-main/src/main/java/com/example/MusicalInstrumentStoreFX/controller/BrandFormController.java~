@@ -1,7 +1,6 @@
 package com.example.MusicalInstrumentStoreFX.controller;
 
 import com.example.MusicalInstrumentStoreFX.loaders.BrandFormLoader;
-import com.example.MusicalInstrumentStoreFX.loaders.MainFormLoader;
 import com.example.MusicalInstrumentStoreFX.model.entity.Brand;
 import com.example.MusicalInstrumentStoreFX.service.BrandService;
 import javafx.fxml.FXML;
@@ -13,14 +12,12 @@ public class BrandFormController {
 
     private final BrandService brandService;
     private final BrandFormLoader brandFormLoader;
-    private final MainFormLoader mainFormLoader;
 
     @FXML private TextField tfFirstName;
 
-    public BrandFormController(BrandService brandService, BrandFormLoader brandFormLoader, MainFormLoader mainFormLoader) {
+    public BrandFormController(BrandService brandService, BrandFormLoader brandFormLoader) {
         this.brandService = brandService;
         this.brandFormLoader = brandFormLoader;
-        this.mainFormLoader = mainFormLoader;
     }
 
     @FXML
@@ -33,6 +30,6 @@ public class BrandFormController {
 
     @FXML
     private void goToMainForm() {
-        mainFormLoader.load();
+        brandFormLoader.load();
     }
 }

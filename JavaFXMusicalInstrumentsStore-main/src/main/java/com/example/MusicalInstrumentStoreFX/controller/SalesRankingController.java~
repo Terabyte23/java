@@ -1,0 +1,94 @@
+package com.example.MusicalInstrumentStoreFX.controller;
+
+import com.example.MusicalInstrumentStoreFX.loaders.MainFormLoader;
+import com.example.MusicalInstrumentStoreFX.model.entity.Instruments;
+import com.example.MusicalInstrumentStoreFX.service.SalesService;
+import com.example.MusicalInstrumentStoreFX.viewmodel.InstrumentSalesViewModel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Controller
+public class SalesRankingController {
+
+    @Autowired
+    private SalesService salesService;
+
+    @FXML
+    private TableView<InstrumentSalesViewModel> table;
+
+    @FXML
+    private TableColumn<InstrumentSalesViewModel, String> colInstrument;
+
+    @FXML
+    private TableColumn<InstrumentSalesViewModel, Integer> colCount;
+
+    private ObservableList<InstrumentSalesViewModel> instrumentsList = FXCollections.observableArrayList();
+    @Autowired
+    private MainFormLoader mainFormLoader;
+
+    @FXML
+    public void initialize() {
+        colInstrument.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        colCount.setCellValueFactory(cellData -> cellData.getValue().countProperty().asObject());
+
+    }
+
+    @FXML
+    private void showAllTime() {
+        updateTable(LocalDate.MIN, LocalDate.now());
+    }
+
+    @FXML
+    private void showYear() {
+        updateTable(LocalDate.now().minusYears(1), LocalDate.now());
+    }
+
+    @FXML
+    private void showMonth() {
+        updateTable(LocalDate.now().minusMonths(1), LocalDate.now());
+    }
+
+    @FXML
+    private void showWeek() {
+        updateTable(LocalDate.now().minusWeeks(1), LocalDate.now());
+    }
+
+    private void updateTable(LocalDate startDate, LocalDate endDate) {
+        List<Object[]> salesRanking = salesService.getSalesRankingForPeriod(startDate, endDate);
+
+        instrumentsList.setAll(
+                salesRanking.stream().map(row -> {
+                    Instruments instrument = (Instruments) row[0];
+                    int countSold = (Integer) row[1];
+                    return new InstrumentSalesViewModel(instrument.getTitle(), countSold);
+                }).collect(Collectors.toList())
+        );
+
+        table.setItems(instrumentsList);
+    }
+
+    @FXML
+    private void goBack() {
+        mainFormLoader.load();
+    }
+
+    private void showAlert(String title, String message, AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}

@@ -34,16 +34,20 @@ public class SalesService {
     }
 
     public List<InstrumentRatingViewModel> getInstrumentSalesRating(LocalDate from, LocalDate to) {
+        // Заменяем на существующий метод из репозитория
         List<Object[]> salesData = saleRepository.getSalesRanking(from, to);
 
+        // Преобразуем Object[] в InstrumentRatingViewModel
         return salesData.stream()
                 .map(data -> {
-                    Instruments instrument = (Instruments) data[0];
-                    Integer count = ((Number) data[1]).intValue();
-                    return new InstrumentRatingViewModel(instrument.getTitle(), count, instrument);
+                    String title = (String) data[0];         // Название инструмента
+                    Long countLong = (Long) data[1];         // COUNT в JPA по умолчанию возвращает Long
+                    int count = countLong.intValue();        // Преобразуем к Integer
+
+                    // Собираем в ViewModel
+                    return new InstrumentRatingViewModel(title, count);
                 })
                 .collect(Collectors.toList());
     }
-
 
 }

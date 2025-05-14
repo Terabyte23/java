@@ -71,7 +71,7 @@ public class AppUser {
     private Double balance = 0.0;
 
     public Double getBalance() {
-        return balance;
+        return balance != null ? balance : 0.0;
     }
 
     public void setBalance(Double balance) {

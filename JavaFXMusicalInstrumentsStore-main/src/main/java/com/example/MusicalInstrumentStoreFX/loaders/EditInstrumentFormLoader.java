@@ -5,34 +5,37 @@ import com.example.MusicalInstrumentStoreFX.model.entity.Instruments;
 import com.example.MusicalInstrumentStoreFX.tools.SpringFXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class EditInstrumentFormLoader {
-    private final SpringFXMLLoader springFXMLLoader;
+public class EditInstrumentFormLoader extends AbstractFormLoader {
 
     public EditInstrumentFormLoader(SpringFXMLLoader springFXMLLoader) {
-        this.springFXMLLoader = springFXMLLoader;
+        super(springFXMLLoader);
     }
 
-    public void loadEditInstrumentForm(Stage primaryStage, Instruments selectedInstrument) {
+    public void load(Instruments selectedInstrument) {
         try {
-            var fxmlLoader = springFXMLLoader.load("/instrument/editInstrumentForm.fxml");
+            var fxmlLoader = getSpringFXMLLoader().load("/instrument/editInstrumentForm.fxml");
             Parent root = fxmlLoader.load();
             EditInstrumentsFormController controller = fxmlLoader.getController();
             controller.setEditInstruments(selectedInstrument);
 
             Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Редактирование инструмента");
-            primaryStage.centerOnScreen();
-            primaryStage.setResizable(false);
-            primaryStage.show();
+            getPrimaryStage().setScene(scene);
+            getPrimaryStage().setTitle("Редактирование инструмента");
+            getPrimaryStage().centerOnScreen();
+            getPrimaryStage().setResizable(false);
+            getPrimaryStage().show();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    @Override
+    public Parent load() {
+        // Реализация метода без параметров (можно оставить пустым, если не нужно)
+        throw new UnsupportedOperationException("Этот метод не должен вызываться");
     }
 }

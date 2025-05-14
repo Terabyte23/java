@@ -1,15 +1,15 @@
 package com.example.MusicalInstrumentStoreFX.controller;
 
+import com.example.MusicalInstrumentStoreFX.MusicalInstrumentStoreFxApplication;
 import com.example.MusicalInstrumentStoreFX.loaders.SelectedInstrumentFormModalityLoader;
 import com.example.MusicalInstrumentStoreFX.model.entity.AppUser;
 import com.example.MusicalInstrumentStoreFX.model.entity.Instruments;
-import com.example.MusicalInstrumentStoreFX.model.entity.Sale;
 import com.example.MusicalInstrumentStoreFX.service.AppUserService;
 import com.example.MusicalInstrumentStoreFX.service.InstrumentsService;
-import com.example.MusicalInstrumentStoreFX.service.SalesService;
 import com.example.MusicalInstrumentStoreFX.service.UserInstrumentService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -17,34 +17,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.LocalDate;
+
 
 @Component
 public class SelectedInstrumentFormController {
 
-    @Autowired private MainFormController mainFormController;
-    @Autowired private AppUserService appUserService;
-    @Autowired private SelectedInstrumentFormModalityLoader selectedInstrumentFormModalityLoader;
-    @Autowired private InstrumentsService instrumentsService;
-    @Autowired private UserInstrumentService userInstrumentService;
-    @Autowired private SalesService salesService;
+    @Autowired
+    private MainFormController mainFormController;
+    @Autowired
+    private AppUserService appUserService;
+
 
     @FXML private VBox vbSelectedInstrumentRoot;
-    @FXML private TextField tfQuantity;
-
     private Instruments instruments;
+    @Autowired
+    private SelectedInstrumentFormModalityLoader selectedInstrumentFormModalityLoader;
+    @Autowired
+    private InstrumentsService instrumentsService;
+    @Autowired
+    private UserInstrumentService userInstrumentService;
     private AppUser appUser;
 
-    public SelectedInstrumentFormController() {}
 
-    public SelectedInstrumentFormController(InstrumentsService instrumentsService,
-                                            SelectedInstrumentFormModalityLoader selectedInstrumentFormModalityLoader,
-                                            UserInstrumentService userInstrumentService) {
-        this.instrumentsService = instrumentsService;
+    // Инжектируем FormService и InstrumentsService
+    public SelectedInstrumentFormController(InstrumentsService instrumentsService, SelectedInstrumentFormModalityLoader selectedInstrumentFormModalityLoader, UserInstrumentService userInstrumentService) {
         this.selectedInstrumentFormModalityLoader = selectedInstrumentFormModalityLoader;
+        this.instrumentsService = instrumentsService;
         this.userInstrumentService = userInstrumentService;
     }
 
+    public SelectedInstrumentFormController() {
+        // required for FXMLLoader
+    }
+
+
+    // Устанавливаем инструмент, который был выбран
     public void setInstruments(Instruments instruments) {
         this.instruments = instruments;
     }
@@ -53,9 +60,18 @@ public class SelectedInstrumentFormController {
         this.appUser = appUser;
     }
 
+    @Autowired
+    public void setAppUserService(AppUserService appUserService) {
+        this.appUserService = appUserService;
+    }
+
+
+    // Метод для установки ссылки на MainFormController
     public void setMainFormController(MainFormController mainFormController) {
         this.mainFormController = mainFormController;
     }
+
+    @FXML private TextField tfQuantity; // Поле для ввода количества
 
     @FXML
     private void takeOnInstrument() {
@@ -79,7 +95,7 @@ public class SelectedInstrumentFormController {
             return;
         }
 
-        // Оформляем покупку
+        // Всё хорошо — оформляем покупку
         instruments.setCount(instruments.getCount() - quantityToBuy);
         appUser.setBalance(appUser.getBalance() - totalCost);
 
@@ -87,13 +103,7 @@ public class SelectedInstrumentFormController {
         appUserService.update(appUser);
         userInstrumentService.saveOrUpdate(appUser, instruments, quantityToBuy);
 
-        // Добавляем запись о продаже
-        Sale sale = new Sale();
-        sale.setSaleDate(LocalDate.now());
-        sale.setAmount(totalCost);
-        salesService.addSale(sale);
-
-        showAlert("Успех", String.format("Вы купили инструмент! Списано: %.2f €", totalCost), Alert.AlertType.INFORMATION);
+        showAlert("Успех", "Вы купили инструмент! Списано: " + totalCost, Alert.AlertType.INFORMATION);
         closeWindow();
     }
 
@@ -122,7 +132,7 @@ public class SelectedInstrumentFormController {
         appUser.setBalance(appUser.getBalance() + refund);
         appUserService.update(appUser);
 
-        showAlert("Успех", String.format("Вы вернули инструмент. Возврат: %.2f €", refund), Alert.AlertType.INFORMATION);
+        showAlert("Успех", "Вы вернули инструмент. Возврат: " + refund, Alert.AlertType.INFORMATION);
         closeWindow();
     }
 
@@ -131,7 +141,9 @@ public class SelectedInstrumentFormController {
         stage.close();
     }
 
-    private void showAlert(String title, String message, Alert.AlertType alertType) {
+
+    // Метод для отображения всплывающих сообщений
+    private void showAlert(String title, String message, AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -145,6 +157,8 @@ public class SelectedInstrumentFormController {
             showAlert("Ошибка", "Инструмент или пользователь не найдены", Alert.AlertType.ERROR);
             return;
         }
-        selectedInstrumentFormModalityLoader.load(instrument, appUser);
+
+        selectedInstrumentFormModalityLoader.load(instrument, appUser);  // Загружаем форму
     }
+
 }

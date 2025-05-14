@@ -1,0 +1,4 @@
+package com.example.MusicalInstrumentStoreFX.controller;
+
+public class InstrumentReadingRatingFormController {
+}

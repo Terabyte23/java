@@ -4,21 +4,19 @@ import com.example.MusicalInstrumentStoreFX.tools.SpringFXMLLoader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class NewInstrumentFormLoader {
-    private final SpringFXMLLoader springFXMLLoader;
+public class NewInstrumentFormLoader extends AbstractFormLoader{
 
     public NewInstrumentFormLoader(SpringFXMLLoader springFXMLLoader) {
-        this.springFXMLLoader = springFXMLLoader;
+        super(springFXMLLoader);
     }
-
-    public void loadNewInstrumentForm(Stage primaryStage){
-        FXMLLoader fxmlLoader = springFXMLLoader.load("/instrument/newInstrumentForm.fxml");
+    @Override
+    public Parent load(){
+        FXMLLoader fxmlLoader = getSpringFXMLLoader().load("/instrument/newInstrumentForm.fxml");
         Parent root = null;
         try {
             root = fxmlLoader.load();
@@ -26,7 +24,8 @@ public class NewInstrumentFormLoader {
             throw new RuntimeException(e);
         }
         Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Добавление нового инструмента");
+        getPrimaryStage().setScene(scene);
+        getPrimaryStage().setTitle("Добавление нового инструмента");
+        return root;
     }
 }

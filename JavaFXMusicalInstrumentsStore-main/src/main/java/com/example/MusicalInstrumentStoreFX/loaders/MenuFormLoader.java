@@ -1,5 +1,6 @@
 package com.example.MusicalInstrumentStoreFX.loaders;
 
+import com.example.MusicalInstrumentStoreFX.controller.MenuFormController;
 import com.example.MusicalInstrumentStoreFX.tools.SpringFXMLLoader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,19 +9,26 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class MenuFormLoader {
-    private final SpringFXMLLoader springFXMLLoader;
+public class MenuFormLoader extends AbstractFormLoader {
+    private MenuFormController menuFormController;
 
     public MenuFormLoader(SpringFXMLLoader springFXMLLoader) {
-        this.springFXMLLoader = springFXMLLoader;
+        super(springFXMLLoader);
     }
 
-    public Parent loadMenuForm(){
-        FXMLLoader fxmlLoader = springFXMLLoader.load("/menu/menuForm.fxml");
+    @Override
+    public Parent load() {
+        FXMLLoader fxmlLoader = getSpringFXMLLoader().load("/menu/menuForm.fxml");
         try {
-            return fxmlLoader.load();
-        }catch (IOException e){
-            throw new RuntimeException(e);
+            Parent root = fxmlLoader.load();
+            menuFormController = fxmlLoader.getController();
+            return root;
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка загрузки формы меню", e);
         }
+    }
+
+    public MenuFormController getMenuFormController() {
+        return menuFormController;
     }
 }

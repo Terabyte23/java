@@ -9,20 +9,28 @@ import java.util.Optional;
 
 @Service
 public class AppUserService {
-    public static AppUser currentUser;
 
+    // Сделаем currentUser доступным через геттер и сеттер
+    private static AppUser currentUser;
 
+    // Роли
     public enum ROLES {USER, MANAGER, ADMINISTRATOR};
-    private AppUserRepository repository;
+
+    // Репозиторий пользователей
+    private final AppUserRepository repository;
+
+    // Конструктор сервиса
     public AppUserService(AppUserRepository repository) {
         this.repository = repository;
-        initSuperUser();
+        initSuperUser();  // Инициализируем суперпользователя, если база пустая
     }
 
+    // Обновление пользователя в базе
     public void update(AppUser user) {
         repository.save(user);
     }
 
+    // Инициализация суперпользователя
     private void initSuperUser() {
         if (repository.count() > 0) {
             return;
@@ -38,27 +46,42 @@ public class AppUserService {
         repository.save(admin);
     }
 
+    // Добавление нового пользователя
     public void add(AppUser user) {
         repository.save(user);
     }
+
+    // Аутентификация пользователя
     public boolean authentication(String username, String password) {
         Optional<AppUser> optionalAppUser = repository.findByUsername(username);
-        if(optionalAppUser.isEmpty()) {
+        if (optionalAppUser.isEmpty()) {
             return false;
         }
         AppUser loginUser = optionalAppUser.get();
-        if(!loginUser.getPassword().equals(password)) {
+        if (!loginUser.getPassword().equals(password)) {
             return false;
         }
-        currentUser = loginUser;
+        currentUser = loginUser;  // Устанавливаем текущего пользователя
         return true;
     }
 
+    // Получение всех пользователей
     public List<AppUser> getAllUsers() {
         return repository.findAll();
     }
 
+    // Сохранение пользователя
     public void save(AppUser appUser) {
-        repository.save(appUser);  // Сохраняем пользователя в базе данных
+        repository.save(appUser);
+    }
+
+    // Получение текущего пользователя
+    public static AppUser getCurrentUser() {
+        return currentUser;
+    }
+
+    // Установка текущего пользователя (при необходимости)
+    public static void setCurrentUser(AppUser user) {
+        currentUser = user;
     }
 }

@@ -9,23 +9,15 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class MusicalInstrumentStoreFxApplication extends Application {
-	public static ConfigurableApplicationContext applicationContext;
-	public static Stage primaryStage;
-	private LoginFormLoader loginFormLoader;
-
-	public MusicalInstrumentStoreFxApplication() {
-	}
 
 	public static void main(String[] args) {
-		applicationContext = SpringApplication.run(MusicalInstrumentStoreFxApplication.class, args);
 		launch(args);
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
-		this.primaryStage = primaryStage;
-		loginFormLoader = applicationContext.getBean(LoginFormLoader.class);
-		loginFormLoader.loadLoginForm(MusicalInstrumentStoreFxApplication.primaryStage);
-
+	public void start(Stage primaryStage) {
+		LoginFormLoader loginFormLoader = SpringApplication.run(MusicalInstrumentStoreFxApplication.class).getBean(LoginFormLoader.class);
+		loginFormLoader.setPrimaryStage(primaryStage);
+		loginFormLoader.load();
 	}
 }

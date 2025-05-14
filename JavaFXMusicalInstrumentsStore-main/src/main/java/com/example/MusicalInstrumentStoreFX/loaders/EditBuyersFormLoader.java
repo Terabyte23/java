@@ -6,21 +6,19 @@ import com.example.MusicalInstrumentStoreFX.tools.SpringFXMLLoader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class EditBuyersFormLoader {
-    private final SpringFXMLLoader springFXMLLoader;
+public class EditBuyersFormLoader extends AbstractFormLoader{
 
     public EditBuyersFormLoader(SpringFXMLLoader springFXMLLoader) {
-        this.springFXMLLoader = springFXMLLoader;
+        super(springFXMLLoader);
     }
 
-    public void loadEditBuyersForm(AppUser appUser, Stage primaryStage) {
-        FXMLLoader fxmlLoader = springFXMLLoader.load("/buyers/editBuyerForm.fxml");
+    public void load(AppUser appUser) {
+        FXMLLoader fxmlLoader = getSpringFXMLLoader().load("/buyers/editBuyerForm.fxml");
 
         try {
             Parent editBuyerFormRoot = fxmlLoader.load();
@@ -28,15 +26,20 @@ public class EditBuyersFormLoader {
             editBuyerFormController.setEditBuyer(appUser);
 
             Scene scene = new Scene(editBuyerFormRoot);
-            primaryStage.setTitle("Редактирование покупателя");
-            primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
-            primaryStage.centerOnScreen();
-            primaryStage.show();
+            getPrimaryStage().setTitle("Редактирование покупателя");
+            getPrimaryStage().setScene(scene);
+            getPrimaryStage().setResizable(false);
+            getPrimaryStage().centerOnScreen();
+            getPrimaryStage().show();
 
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+    @Override
+    public Parent load() {
+        // Реализация метода без параметров (можно оставить пустым, если не нужно)
+        throw new UnsupportedOperationException("Этот метод не должен вызываться");
     }
 }

@@ -35,6 +35,10 @@
                     <Menu text="Финансовые отчеты">
                         <MenuItem text="Доход" onAction="#openIncomeReport"/>
                     </Menu>
+                <Menu fx:id="mReports" text="Отчеты">
+                    <MenuItem text="Рейтинг продаж" onAction="#openSalesRanking"/>
+                </Menu>
+
             </menus>
         </MenuBar>
         <Label alignment="CENTER" prefHeight="17.0" prefWidth="600.0" />

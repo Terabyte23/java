@@ -1,10 +1,8 @@
 package com.example.MusicalInstrumentStoreFX.controller;
 
-import com.example.MusicalInstrumentStoreFX.MusicalInstrumentStoreFxApplication;
 import com.example.MusicalInstrumentStoreFX.loaders.ListBuyersFormLoader;
 import com.example.MusicalInstrumentStoreFX.model.entity.AppUser;
 import com.example.MusicalInstrumentStoreFX.service.AppUserService;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -13,92 +11,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 @Component
 public class EditBuyerFormController implements Initializable {
 
     @Autowired
     private AppUserService appUserService;
-    private AppUser editBuyer; // Пользователь, которого редактируем
+
+    @Autowired
+    private ListBuyersFormLoader listBuyersFormLoader;
+
+    private AppUser editBuyer;
 
     @FXML private TextField tfId;
     @FXML private TextField tfLogin;
     @FXML private TextField tfFirstName;
     @FXML private TextField tfLastName;
-    @FXML private ComboBox<String> rolesComboBox;  // Для ролей
-    @Autowired
-    private ListBuyersFormLoader listBuyersFormLoader;
-
-    // Публичный конструктор без параметров
-    public EditBuyerFormController() {
-        // Пустой конструктор для работы с FXML
-    }
-
-    // Конструктор с инъекцией зависимостей через Spring
-    public EditBuyerFormController(AppUserService appUserService) {
-        this.appUserService = appUserService;
-    }
+    @FXML private ComboBox<String> rolesComboBox;
 
     @FXML
     private void saveBuyer() {
-        if (appUserService == null || editBuyer == null) {
-            System.out.println("Сервисы не инициализированы!");
+        if (editBuyer == null) {
+            System.out.println("Редактируемый пользователь не установлен!");
             return;
         }
 
-        // Обновляем данные
         editBuyer.setUsername(tfLogin.getText());
         editBuyer.setFirstname(tfFirstName.getText());
         editBuyer.setLastname(tfLastName.getText());
-        editBuyer.setRoles(new HashSet<>(List.of(rolesComboBox.getValue() != null ? rolesComboBox.getValue() : "USER")));
+        editBuyer.setRoles(new HashSet<>(Collections.singletonList(
+                rolesComboBox.getValue() != null ? rolesComboBox.getValue() : "USER"
+        )));
 
-        // Сохраняем пользователя
         appUserService.save(editBuyer);
-
-        // Возвращаемся к списку покупателей
-        listBuyersFormLoader.loadListBuyersForm(MusicalInstrumentStoreFxApplication.primaryStage);
+        listBuyersFormLoader.load(); // Теперь используем обобщённый метод
     }
-
-
 
     @FXML
     private void cancelEdit() {
-        listBuyersFormLoader.loadListBuyersForm(MusicalInstrumentStoreFxApplication.primaryStage);
+        listBuyersFormLoader.load();
     }
-
-
-    public void setAppUserService(AppUserService appUserService) {
-        this.appUserService = appUserService;
-    }
-
 
     public void setEditBuyer(AppUser editBuyer) {
-        // Инициализация формы данными пользователя
         this.editBuyer = editBuyer;
-        tfId.setText(editBuyer.getId().toString());
+
+        tfId.setText(String.valueOf(editBuyer.getId()));
         tfLogin.setText(editBuyer.getUsername());
         tfFirstName.setText(editBuyer.getFirstname());
         tfLastName.setText(editBuyer.getLastname());
 
-        // Преобразуем Set в List
-        List<String> rolesList = new ArrayList<>(editBuyer.getRoles());
+        rolesComboBox.getItems().setAll("USER", "ADMIN");
 
-        // Устанавливаем роли в ComboBox
-        rolesComboBox.getItems().setAll("USER", "ADMIN"); // Пример ролей
-
-        // Проверяем, если Set содержит хотя бы один элемент, выбираем его
-        if (!rolesList.isEmpty()) {
-            rolesComboBox.getSelectionModel().select(rolesList.get(0)); // Выбираем текущую роль
+        if (!editBuyer.getRoles().isEmpty()) {
+            rolesComboBox.getSelectionModel().select(editBuyer.getRoles().iterator().next());
         }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Инициализация ComboBox для ролей (например, "USER", "ADMIN")
         rolesComboBox.getItems().setAll("USER", "ADMIN");
     }
 }

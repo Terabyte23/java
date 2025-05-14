@@ -1,26 +1,23 @@
 package com.example.MusicalInstrumentStoreFX.loaders;
 
-import com.example.MusicalInstrumentStoreFX.controller.IncomeReportController;
 import com.example.MusicalInstrumentStoreFX.tools.SpringFXMLLoader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class IncomeReportPageLoader {
-
-    private final SpringFXMLLoader springFXMLLoader;
+public class IncomeReportPageLoader extends AbstractFormLoader {
 
     public IncomeReportPageLoader(SpringFXMLLoader springFXMLLoader) {
-        this.springFXMLLoader = springFXMLLoader;
+        super(springFXMLLoader);
     }
 
-    public void loadIncomeReportPage(Stage primaryStage) {
-        FXMLLoader fxmlLoader = springFXMLLoader.load("/income/incomeReportPage.fxml");
+    @Override
+    public Parent load() {
+        FXMLLoader fxmlLoader = getSpringFXMLLoader().load("/income/incomeReportPage.fxml");
         Parent root;
         try {
             root = fxmlLoader.load();
@@ -28,9 +25,10 @@ public class IncomeReportPageLoader {
             throw new RuntimeException("Ошибка при загрузке страницы отчета о доходах", e);
         }
         Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Отчет о доходах");
-        primaryStage.centerOnScreen();
-        primaryStage.show();
+        getPrimaryStage().setScene(scene);
+        getPrimaryStage().setTitle("Отчет о доходах");
+        getPrimaryStage().centerOnScreen();
+        getPrimaryStage().show();
+        return root;
     }
 }

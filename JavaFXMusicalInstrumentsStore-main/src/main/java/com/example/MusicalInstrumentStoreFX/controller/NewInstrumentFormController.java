@@ -56,11 +56,11 @@ public class NewInstrumentFormController implements Initializable {
         }
 
         instrumentsService.create(instruments);
-        mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
+        mainFormLoader.load();
     }
 
     @FXML private void goToMainForm() {
-        mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
+        mainFormLoader.load();
     }
 
     @Override

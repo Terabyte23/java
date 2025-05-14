@@ -36,14 +36,14 @@ public class RegistrationFormController {
             newUser.setPassword(pfPassword.getText());
             newUser.getRoles().add(AppUserService.ROLES.USER.toString());
             appUserService.add(newUser);
-            loginFormLoader.loadLoginForm(MusicalInstrumentStoreFxApplication.primaryStage);
+            loginFormLoader.load();
         }catch (Exception e){
             throw new RuntimeException(e);
         }
         }
 
         @FXML private void goToMainForm() {
-            mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
+            mainFormLoader.load();
         }
     }
 

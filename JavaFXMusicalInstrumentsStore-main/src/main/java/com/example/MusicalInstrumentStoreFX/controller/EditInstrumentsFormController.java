@@ -1,6 +1,5 @@
 package com.example.MusicalInstrumentStoreFX.controller;
 
-import com.example.MusicalInstrumentStoreFX.MusicalInstrumentStoreFxApplication;
 import com.example.MusicalInstrumentStoreFX.loaders.MainFormLoader;
 import com.example.MusicalInstrumentStoreFX.model.entity.Brand;
 import com.example.MusicalInstrumentStoreFX.model.entity.Instruments;
@@ -9,86 +8,90 @@ import com.example.MusicalInstrumentStoreFX.service.InstrumentsService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 @Component
 public class EditInstrumentsFormController implements Initializable {
-    private final MainFormLoader mainFormLoader;
-    private final InstrumentsService instrumentsService;
-    private final BrandService brandService;
+
+    @Autowired private InstrumentsService instrumentsService;
+    @Autowired private BrandService brandService;
+    @Autowired private MainFormLoader mainFormLoader;
+
     private Instruments editInstruments;
 
-    @FXML
-    private TextField tfId;
+    @FXML private TextField tfId;
     @FXML private TextField tfTitle;
     @FXML private ListView<Brand> lvBrands;
     @FXML private TextField tfPublicationYear;
     @FXML private TextField tfQuantity;
     @FXML private TextField tfCount;
 
+    @FXML
+    private void goEdit() {
+        if (editInstruments == null) return;
 
-    public EditInstrumentsFormController(InstrumentsService instrumentsService, BrandService brandService, MainFormLoader mainFormLoader) {
-        this.instrumentsService = instrumentsService;
-        this.brandService = brandService;
-        this.mainFormLoader = mainFormLoader;
-    }
-    @FXML private void goEdit(){
         editInstruments.setTitle(tfTitle.getText());
-        editInstruments.getBrand().clear(); // Очищает текущий список брендов
+        editInstruments.getBrand().clear();
         editInstruments.getBrand().addAll(lvBrands.getSelectionModel().getSelectedItems());
         editInstruments.setPublicationYear(Integer.parseInt(tfPublicationYear.getText()));
         editInstruments.setQuantity(Integer.parseInt(tfQuantity.getText()));
         editInstruments.setCount(editInstruments.getQuantity());
-        instrumentsService.create(editInstruments);
-        mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
-    }
 
-    @FXML private void goToMainForm() throws IOException {
-        mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
+        instrumentsService.create(editInstruments);
+        mainFormLoader.load();
     }
 
     @FXML
     private void deleteInstrument() {
-        Long instrumentId = Long.parseLong(tfId.getText()); // Получите ID из текстового поля
-        instrumentsService.deleteInstrumentAndResortIds(instrumentId);
+        if (tfId.getText() != null && !tfId.getText().isEmpty()) {
+            Long instrumentId = Long.parseLong(tfId.getText());
+            instrumentsService.deleteInstrumentAndResortIds(instrumentId);
+            mainFormLoader.load();
+        }
     }
 
-
+    @FXML
+    private void goToMainForm() {
+        mainFormLoader.load();
+    }
 
     public void setEditInstruments(Instruments editInstruments) {
         this.editInstruments = editInstruments;
-        tfId.setText(editInstruments.getId().toString());
-        tfTitle.setText(editInstruments.getTitle());
-        tfPublicationYear.setText(((Integer) editInstruments.getPublicationYear()).toString());
-        tfQuantity.setText(((Integer) editInstruments.getQuantity()).toString());
-        tfCount.setText(((Integer) editInstruments.getCount()).toString());
 
+        tfId.setText(String.valueOf(editInstruments.getId()));
+        tfTitle.setText(editInstruments.getTitle());
+        tfPublicationYear.setText(String.valueOf(editInstruments.getPublicationYear()));
+        tfQuantity.setText(String.valueOf(editInstruments.getQuantity()));
+        tfCount.setText(String.valueOf(editInstruments.getCount()));
+
+        // Отмечаем связанные бренды
+        lvBrands.getSelectionModel().clearSelection();
+        for (Brand brand : editInstruments.getBrand()) {
+            int index = lvBrands.getItems().indexOf(brand);
+            if (index >= 0) {
+                lvBrands.getSelectionModel().select(index);
+            }
+        }
     }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         lvBrands.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        List<Brand> authors = brandService.getListBrand();
-        lvBrands.getItems().setAll(FXCollections.observableArrayList(authors));
+        List<Brand> brands = brandService.getListBrand();
+        lvBrands.setItems(FXCollections.observableArrayList(brands));
+
         lvBrands.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Brand brand, boolean empty) {
                 super.updateItem(brand, empty);
-                if (empty || brand == null) {
-                    setText(null);
-                } else {
-                    setText("ID: " + brand.getId() + " - " + brand.getFirstName());
-                }
+                setText(empty || brand == null ? null : "ID: " + brand.getId() + " - " + brand.getFirstName());
             }
         });
     }
-
 }

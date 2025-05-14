@@ -1,0 +1,28 @@
+package com.example.MusicalInstrumentStoreFX.viewmodel;
+
+import com.example.MusicalInstrumentStoreFX.model.entity.Instruments;
+import javafx.beans.property.*;
+
+public class InstrumentSalesViewModel {
+
+    private final StringProperty title = new SimpleStringProperty();
+    private final IntegerProperty countSold = new SimpleIntegerProperty();
+
+    public InstrumentSalesViewModel(String title, int countSold) {
+        this.title.set(title);
+        this.countSold.set(countSold);
+    }
+
+    public InstrumentSalesViewModel(Instruments instrument) {
+        this.title.set(instrument.getTitle());
+        this.countSold.set(instrument.getCount());
+    }
+
+    public StringProperty titleProperty() {
+        return title;
+    }
+
+    public IntegerProperty countSoldProperty() {
+        return countSold;
+    }
+}

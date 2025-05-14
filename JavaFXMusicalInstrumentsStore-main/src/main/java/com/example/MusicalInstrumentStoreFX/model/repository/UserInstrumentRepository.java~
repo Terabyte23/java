@@ -1,0 +1,4 @@
+package com.example.MusicalInstrumentStoreFX.model.repository;
+
+public class UserInstrumentRepository {
+}

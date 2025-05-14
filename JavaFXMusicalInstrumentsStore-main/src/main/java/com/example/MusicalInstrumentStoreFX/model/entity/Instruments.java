@@ -1,17 +1,33 @@
 package com.example.MusicalInstrumentStoreFX.model.entity;
 
 import jakarta.persistence.*;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 public class Instruments {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
+    private int publicationYear;
+    private int quantity;
+    private int count;
+    private Integer orderNumber;
+    private double price;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    private String type;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -21,17 +37,9 @@ public class Instruments {
     )
     private Set<Brand> brands = new HashSet<>();
 
-    private int publicationYear;
-    private int quantity;
-    private int count;
-
-    // Новое поле для сортировки инструментов
-    private Integer orderNumber;
-
-    // Добавляем поле для цены
-    private double price;
-
     public Instruments() {}
+
+    // Геттеры и сеттеры
 
     public Long getId() {
         return id;
@@ -47,14 +55,6 @@ public class Instruments {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public Set<Brand> getBrand() {
-        return brands;
-    }
-
-    public void setBrand(Set<Brand> brands) {
-        this.brands = brands;
     }
 
     public int getPublicationYear() {
@@ -89,7 +89,6 @@ public class Instruments {
         this.orderNumber = orderNumber;
     }
 
-    // Геттер и сеттер для поля price
     public double getPrice() {
         return price;
     }
@@ -98,24 +97,34 @@ public class Instruments {
         this.price = price;
     }
 
+    public Set<Brand> getBrand() {
+        return brands;
+    }
+
+    public void setBrand(Set<Brand> brands) {
+        this.brands = brands;
+    }
+
+    // equals, hashCode, toString
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Instruments instruments = (Instruments) o;
-        return publicationYear == instruments.publicationYear &&
-                quantity == instruments.quantity &&
-                count == instruments.count &&
-                Double.compare(instruments.price, price) == 0 &&
-                Objects.equals(id, instruments.id) &&
-                Objects.equals(title, instruments.title) &&
-                Objects.equals(brands, instruments.brands) &&
-                Objects.equals(orderNumber, instruments.orderNumber);
+        if (!(o instanceof Instruments)) return false;
+        Instruments that = (Instruments) o;
+        return publicationYear == that.publicationYear &&
+                quantity == that.quantity &&
+                count == that.count &&
+                Double.compare(that.price, price) == 0 &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(brands, that.brands) &&
+                Objects.equals(orderNumber, that.orderNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, brands, publicationYear, quantity, count, orderNumber, price);
+        return Objects.hash(id, title, publicationYear, quantity, count, orderNumber, price, brands);
     }
 
     @Override
@@ -123,7 +132,7 @@ public class Instruments {
         return "Instrument{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", brands=" + Arrays.toString(brands.toArray()) +
+                ", brands=" + brands +
                 ", publicationYear=" + publicationYear +
                 ", quantity=" + quantity +
                 ", count=" + count +

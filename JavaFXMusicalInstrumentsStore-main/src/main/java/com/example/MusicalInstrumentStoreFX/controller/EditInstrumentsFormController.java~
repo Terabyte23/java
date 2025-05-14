@@ -15,57 +15,80 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 @Component
-public class NewInstrumentFormController implements Initializable {
-
+public class EditInstrumentsFormController implements Initializable {
     private final MainFormLoader mainFormLoader;
     private final InstrumentsService instrumentsService;
     private final BrandService brandService;
+    private Instruments editInstruments;
 
+    @FXML
+    private TextField tfId;
     @FXML private TextField tfTitle;
     @FXML private ListView<Brand> lvBrands;
     @FXML private TextField tfPublicationYear;
     @FXML private TextField tfQuantity;
+    @FXML private TextField tfCount;
 
-    public NewInstrumentFormController(InstrumentsService instrumentsService, BrandService brandService, MainFormLoader mainFormLoader) {
+
+    public EditInstrumentsFormController(InstrumentsService instrumentsService, BrandService brandService, MainFormLoader mainFormLoader) {
         this.instrumentsService = instrumentsService;
         this.brandService = brandService;
         this.mainFormLoader = mainFormLoader;
     }
-    @FXML private void create(){
-        Instruments instruments = new Instruments();
-        instruments.setTitle(tfTitle.getText());
-        instruments.getBrand().addAll(lvBrands.getSelectionModel().getSelectedItems());
-        instruments.setPublicationYear(Integer.parseInt(tfPublicationYear.getText()));
-        instruments.setQuantity(Integer.parseInt(tfQuantity.getText()));
-        instruments.setCount(instruments.getQuantity());
-        instrumentsService.create(instruments);
+    @FXML private void goEdit(){
+        editInstruments.setTitle(tfTitle.getText());
+        editInstruments.getBrand().clear(); // Очищает текущий список брендов
+        editInstruments.getBrand().addAll(lvBrands.getSelectionModel().getSelectedItems());
+        editInstruments.setPublicationYear(Integer.parseInt(tfPublicationYear.getText()));
+        editInstruments.setQuantity(Integer.parseInt(tfQuantity.getText()));
+        editInstruments.setCount(editInstruments.getQuantity());
+        instrumentsService.create(editInstruments);
         mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
     }
 
-    @FXML private void goToMainForm(){
+    @FXML private void goToMainForm() throws IOException {
         mainFormLoader.loadMainForm(MusicalInstrumentStoreFxApplication.primaryStage);
     }
 
+    @FXML
+    private void deleteInstrument() {
+        Long instrumentId = Long.parseLong(tfId.getText()); // Получите ID из текстового поля
+        instrumentsService.deleteInstrumentAndResortIds(instrumentId);
+    }
+
+
+
+    public void setEditInstruments(Instruments editInstruments) {
+        this.editInstruments = editInstruments;
+        tfId.setText(editInstruments.getId().toString());
+        tfTitle.setText(editInstruments.getTitle());
+        tfPublicationYear.setText(((Integer) editInstruments.getPublicationYear()).toString());
+        tfQuantity.setText(((Integer) editInstruments.getQuantity()).toString());
+        tfCount.setText(((Integer) editInstruments.getCount()).toString());
+
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         lvBrands.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        List<Brand> brands = brandService.getListBrand();
-        lvBrands.getItems().setAll(FXCollections.observableArrayList(brands));
+        List<Brand> authors = brandService.getListBrand();
+        lvBrands.getItems().setAll(FXCollections.observableArrayList(authors));
         lvBrands.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Brand brand, boolean empty) {
                 super.updateItem(brand, empty);
                 if (empty || brand == null) {
                     setText(null);
-                }else {
-                    setText(brand.getId() + ". " + brand.getFirstName());
+                } else {
+                    setText("ID: " + brand.getId() + " - " + brand.getFirstName());
                 }
             }
         });
     }
+
 }
